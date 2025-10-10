@@ -1,18 +1,33 @@
 package techpulse.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import techpulse.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import techpulse.dto.login.LoginRequest;
+import techpulse.dto.login.LoginResponse;
+import techpulse.service.AuthService;
 
+@Tag(name = "Authentication", description = "User login endpoints")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "User Authentication", description = "Endpoints for user authentication")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-
+    @Operation(summary = "Login user", description = "Authenticate user and return JWT token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
+            @ApiResponse(responseCode = "401", description = "Invalid username or password")
+    })
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
 }

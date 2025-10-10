@@ -43,6 +43,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
     public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
