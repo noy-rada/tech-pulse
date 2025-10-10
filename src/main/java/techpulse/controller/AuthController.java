@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import techpulse.dto.login.LoginRequest;
 import techpulse.dto.login.LoginResponse;
-import techpulse.service.AuthService;
+import techpulse.service.auth.AuthService;
 
 @Tag(name = "Authentication", description = "User login endpoints")
 @RestController
@@ -29,5 +29,22 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Logout user", description = "Invalidate JWT token and logout user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully logged out"),
+            @ApiResponse(responseCode = "400", description = "Invalid Authorization header")
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Invalid Authorization Header");
+        }
+
+        String token = authHeader.substring(7);
+        authService.logout(token);
+
+        return ResponseEntity.ok("Successfully logged out");
     }
 }
