@@ -1,6 +1,5 @@
 package techpulse.exception;
 
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 

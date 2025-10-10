@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -62,5 +63,14 @@ public class GlobalExceptionHandler {
         logger.warn("Validation failed: {}", errors);
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handleNoResourceFound(NoResourceFoundException ex) {
+        if (ex.getResourcePath().equalsIgnoreCase("favicon.ico")) {
+            return ResponseEntity.ok().build(); // ignore favicon requests
+        }
+        return ResponseEntity.internalServerError().body("Unexpected error: " + ex.getMessage());
+    }
+
 
 }

@@ -5,14 +5,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import techpulse.domain.User;
+import techpulse.dto.UserDTO;
 import techpulse.service.UserService;
 
 import java.util.List;
 
-@Tag(name = "User Management", description = "APIs for manging users")
+@Tag(name = "User Management", description = "APIs for managing users")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -40,22 +42,22 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(
             @Parameter(description = "ID of the user to retrieve", example = "1")
-            @PathVariable Long id)
-    {
+            @PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @Operation(summary = "Create a new user", description = "Add a new user to the system")
+    @Operation(summary = "Register a new user", description = "Register a new user in the system")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully created user"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data")
+            @ApiResponse(responseCode = "201", description = "Successfully registered user"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "409", description = "Username already exists")
     })
-    @PostMapping
-    public ResponseEntity<User> createUser(
-            @Parameter(description = "User object to be created")
-            @RequestBody User user)
-    {
-        return ResponseEntity.ok(userService.createUser(user));
+    @PostMapping("/register")
+    public ResponseEntity<User> registerUser(
+            @Parameter(description = "User registration data")
+            @Valid @RequestBody UserDTO userDTO) {
+        User createdUser = userService.registerUser(userDTO);
+        return ResponseEntity.status(201).body(createdUser);
     }
 
     @Operation(summary = "Update an existing user", description = "Update a user's information by their ID")
@@ -68,10 +70,9 @@ public class UserController {
     public ResponseEntity<User> updateUser(
             @Parameter(description = "ID of the user to update", example = "1")
             @PathVariable Long id,
-            @Parameter(description = "Updated user object")
-            @RequestBody User user)
-    {
-        return ResponseEntity.ok(userService.updateUser(id, user));
+            @Parameter(description = "Updated user data")
+            @Valid @RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.updateUser(id, userDTO));
     }
 
     @Operation(summary = "Delete a user", description = "Remove a user from the system by their ID")
@@ -82,8 +83,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(
             @Parameter(description = "ID of the user to delete", example = "1")
-            @PathVariable Long id)
-    {
+            @PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
