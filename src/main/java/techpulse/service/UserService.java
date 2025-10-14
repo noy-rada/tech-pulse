@@ -13,6 +13,7 @@ import techpulse.mapper.UserMapper;
 import techpulse.repository.RoleRepository;
 import techpulse.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -43,14 +44,21 @@ public class UserService {
             throw new RuntimeException("Username already exists");
         }
 
-        Role  userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new ResourceNotFoundException("Default role is ROLE_USER not found."));
+        // Check for duplicate email
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+
+        // Fetch default role
+        Role defaultRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new ResourceNotFoundException("Default role ROLE_USER not found"));
 
         User user = User.builder()
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .email(userDTO.getEmail())
-                .roles(Set.of(userRole))
+                .roles(new HashSet<>(Set.of(defaultRole)))
                 .enabled(true)
                 .build();
 

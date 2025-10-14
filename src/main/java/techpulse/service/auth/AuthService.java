@@ -27,21 +27,23 @@ public class AuthService {
      */
     public LoginResponse login(LoginRequest request) {
         try {
+            // Authenticate using email
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
+                            request.getEmail(),
                             request.getPassword()
                     )
             );
 
-            String token = jwtUtil.generateToken(request.getUsername());
+            // Generate token using email
+            String token = jwtUtil.generateToken(request.getEmail());
             Date issuedAt = new Date();
             Date expiresAt = new Date(issuedAt.getTime() + jwtUtil.getExpirationMs());
 
             // Save token in DB
             UserToken userToken = UserToken.builder()
                     .token(token)
-                    .username(request.getUsername())
+                    .username(request.getEmail()) // use email here
                     .issuedAt(String.valueOf(issuedAt))
                     .expiresAt(expiresAt)
                     .revoked(false)
@@ -49,7 +51,7 @@ public class AuthService {
 
             tokenRepository.save(userToken);
 
-            return new LoginResponse(request.getUsername(), token, expiresAt);
+            return new LoginResponse(request.getEmail(), token, expiresAt);
 
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid username or password");

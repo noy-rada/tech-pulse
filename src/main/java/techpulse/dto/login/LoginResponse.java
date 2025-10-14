@@ -9,7 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class LoginResponse {
 
-    private String username;
+    private String email;
     private String token;
     private Date expiredDate;
 
