@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -29,7 +30,15 @@ public class User {
 
     private boolean enabled = true;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
+
+//    @ElementCollection(fetch = FetchType.EAGER)
+//    private Set<String> roles;
 
 }

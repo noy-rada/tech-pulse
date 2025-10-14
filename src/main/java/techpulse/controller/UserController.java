@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import techpulse.domain.User;
 import techpulse.dto.UserDTO;
@@ -30,7 +31,8 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of users")
     })
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -40,7 +42,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(
+    public ResponseEntity<UserDTO> getUser(
             @Parameter(description = "ID of the user to retrieve", example = "1")
             @PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
@@ -67,7 +69,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input data")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(
+    public ResponseEntity<UserDTO> updateUser(
             @Parameter(description = "ID of the user to update", example = "1")
             @PathVariable Long id,
             @Parameter(description = "Updated user data")
@@ -87,4 +89,16 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Assign role to a user", description = "Assign a role (ADMIN/USER) to a user")
+    @PostMapping("/{id}/role/{roleName}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> assignRole(
+            @Parameter(description = "ID of the user", example = "1") @PathVariable Long id,
+            @Parameter(description = "Role name to assign", example = "ROLE_ADMIN") @PathVariable String roleName) {
+
+        userService.assignRoleToUser(id, roleName);
+        return ResponseEntity.ok().build();
+    }
+
 }
