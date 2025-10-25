@@ -11,24 +11,22 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    // ✅ Convert Entity -> DTO
+    // Convert Entity -> DTO
     public UserDTO toDTO(User user) {
         if (user == null) return null;
 
-        UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
-        dto.setEnabled(user.isEnabled());
-        dto.setRoles(
-                user.getRoles().stream()
+        return UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .enabled(user.isEnabled())
+                .roles(user.getRoles().stream()
                         .map(Role::getName)
-                        .collect(Collectors.toSet())
-        );
-        return dto;
+                        .collect(Collectors.toSet()))
+                .build();
     }
 
-    // ✅ Convert DTO -> Entity (optional, for update or create)
+    // Convert DTO -> Entity (optional, for update or create)
     public User toEntity(UserDTO dto, Set<Role> roles) {
         if (dto == null) return null;
 
@@ -37,7 +35,7 @@ public class UserMapper {
                 .username(dto.getUsername())
                 .email(dto.getEmail())
                 .enabled(dto.isEnabled())
-                .password(dto.getPassword()) // Note: password should be encoded later
+                .password(dto.getPassword()) // encode in service
                 .roles(roles)
                 .build();
     }

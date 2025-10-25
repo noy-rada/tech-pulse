@@ -3,6 +3,7 @@ package techpulse.service;
 import com.sun.jdi.request.DuplicateRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import techpulse.domain.Role;
@@ -15,6 +16,7 @@ import techpulse.repository.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -34,6 +36,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.userMapper = userMapper;
+    }
+
+    public Optional<UserDTO> getUserByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+
+        return userRepository.findByEmail(email)
+                .map(userMapper::toDTO);
     }
 
     // User registration

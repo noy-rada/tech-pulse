@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import techpulse.domain.User;
 import techpulse.dto.UserDTO;
 import techpulse.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
+import java.util.Optional;
 
 @Tag(name = "User Management", description = "APIs for managing users")
 @RestController
@@ -99,6 +103,39 @@ public class UserController {
 
         userService.assignRoleToUser(id, roleName);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Get current logged-in user", description = "Retrieve info about the currently authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved current user"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @GetMapping("/current-user")
+    public ResponseEntity<UserDTO> getCurrentUser(
+            @RequestParam(required = false) String email) {
+
+        // If no param, fetch logged-in user
+        if (email == null || email.isEmpty()) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).build();
+            }
+
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                email = ((UserDetails) principal).getUsername();
+            } else if (principal instanceof String) {
+                email = (String) principal;
+            }
+
+            if (email == null) {
+                return ResponseEntity.status(401).build();
+            }
+        }
+
+        Optional<UserDTO> user = userService.getUserByEmail(email);
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(404).build());
     }
 
 }
