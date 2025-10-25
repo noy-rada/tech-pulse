@@ -62,8 +62,8 @@ public class UserService {
 
 
         // Fetch default role
-        Role defaultRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new ResourceNotFoundException("Default role ROLE_USER not found"));
+        Role defaultRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new ResourceNotFoundException("Default role USER not found"));
 
         User user = User.builder()
                 .username(userDTO.getUsername())
