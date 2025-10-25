@@ -23,6 +23,10 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
     private String tags;
 
     @Column(nullable = false)

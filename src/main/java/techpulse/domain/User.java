@@ -38,7 +38,5 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-//    @ElementCollection(fetch = FetchType.EAGER)
-//    private Set<String> roles;
 
 }
