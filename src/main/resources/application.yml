@@ -6,9 +6,9 @@ spring:
     name: Tech Pulse
 
   datasource:
-    url: jdbc:postgresql://dpg-d3rpoqngi27c73f9g960-a.oregon-postgres.render.com:5432/pro_techpulse
+    url: jdbc:postgresql://dpg-d4k5vmndiees73bahfm0-a.singapore-postgres.render.com:5432/pro_techpulse_fck5
     username: techpulse
-    password: ks9qAy9QKVHcqcaAvTxamWBe90kTJ4DK
+    password: 08Vz2gEWeKdWu44SV8nZoQgAr76hIS4z
 
     driver-class-name: org.postgresql.Driver
 
